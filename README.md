@@ -12,7 +12,7 @@ This Docker container contains Amazon EC2 scripts to simplify reporting addition
 Run it in `--privileged` mode.
 
 Options:
-- `-d disk_path` - report `disk_path` disk usage, mat be used multiple times
+- `-d disk_path` - report `disk_path` disk usage, may be used multiple times
 - `-s` - report swap usage
 - `-m` - report memory usage
 
