@@ -1,0 +1,56 @@
+# Docker Cloudwatch Monitoring
+
+based on.
+https://docs.aws.amazon.com/AWSEC2/latest/UserGuide/mon-scripts.html
+
+This script collects memory, swap, and disk space utilization data on the current system. It then makes a remote call to Amazon CloudWatch to report the collected data as custom metrics.
+
+This Docker container contains Amazon EC2 scripts to simplify reporting additional EC2 instance information to Cloudwatch. These Perl scripts comprise a fully functional examples that reports memory, swap, and disk space utilization metrics for a Linux instance. You can learn more about the scripts [here](http://docs.aws.amazon.com/AmazonCloudWatch/latest/DeveloperGuide/mon-scripts.html).
+
+## Running it
+
+Run it in `--privileged` mode.
+
+Options:
+- `-d disk_path` - report `disk_path` disk usage, mat be used multiple times
+- `-s` - report swap usage
+- `-m` - report memory usage
+
+```
+docker run --privileged deadroot/docker-cloudwatch-monitoring -m -s -d /etc/hosts -d /mnt/a
+```
+
+If you have correct IAM role associated with the instance, it will work without explicit credentials specification. See [Configuration](#Configuration) section for the ways to specify credentials.
+
+## Configuration
+
+You can specify credentials in the following ways:
+
+### IAM role
+
+IAM role is automatically taken from instance's metadata. Role may be also put into `AWS_IAM_ROLE` variable.
+
+Instance's IAM role should have the following permissions:
+
+- `cloudwatch:PutMetricData`
+- `cloudwatch:GetMetricStatistics`
+- `cloudwatch:ListMetrics`
+- `ec2:DescribeTags`
+
+### Credentials file
+
+Create credentials file with the following content:
+
+```
+AWSAccessKeyId=YourAccessKeyID
+AWSSecretKey=YourSecretAccessKey
+```
+
+Add it to the container to path `/awscreds`: `docker run -v ./aws_creds_file.txt:/awscreds ...`
+
+### Environment
+
+Use the following env. variables for credentials:
+
+1. `AWS_ACCESS_KEY_ID` and `AWS_SECRET_ACCESS_KEY`
+2. `AWS_IAM_ROLE` - IAM role name, used only if `AWS_ACCESS_KEY_ID` or `AWS_SECRET_ACCESS_KEY` not specified/empty.
